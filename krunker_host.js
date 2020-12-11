@@ -1,13 +1,23 @@
 /*
-Run this script on your browser* when you're on the 'host game' menu, input your exported map data** when prompted and wait for your game to start with all the settings automatically inputted.
+Run this script on your browser* when you're on the 'host game' menu, input
+your exported map data** when prompted and wait for your game to start with all
+the settings automatically inputted.
 
-You can input nothing and the script will by default set the match time to 0 and make the lobby private.
+You can input nothing and the script will by default set the match time to 0
+and make the lobby private.
 
 Comment out the final line to disable automatically starting the server.
 
-* On Chrome, press F12 to open DevTools, go to the console tab, copy-paste the code and press enter. Alternatively save the script as a snippet for easy future access (see https://developers.google.com/web/tools/chrome-devtools/javascript/snippets). You may have to adjust the size of your game window on DevTools so that it's big enough for Krunker to not mistake it for a mobile app. If you don't do this you may see mobile controls show up.
+* On Chrome, press F12 to open DevTools, go to the console tab, copy-paste the
+code and press enter. Alternatively save the script as a snippet for easy
+future access (see https://developers.google.com/web/tools/chrome-devtools/javascript/snippets).
+You may have to adjust the size of your game window on DevTools so that it's
+big enough for Krunker to not mistake it for a mobile app. If you don't do
+this you may see mobile controls show up.
 
-** When you host from the editor, you'll have your export data automatically placed in the 'raw game data' input field. You can just copy that and give it to this script.
+** When you host from the editor, you'll have your export data automatically
+placed in the 'raw game data' input field. You can just copy that and give it
+to this script.
 
 @Corrade#0901
 */
