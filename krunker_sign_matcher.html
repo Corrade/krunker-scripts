@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<style type = text/css>
+    	body {
+        	font-family: Arial, Helvetica, sans-serif;
+            background-color: WhiteSmoke;
+            max-width: 600px;
+        }
+        input {
+        	height: 30px;
+        }
+    	.cont_vert {
+        	display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    	.cont_hor {
+        	display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .thin {
+        	width: 100px;
+        }
+        .xthin {
+        	width: 50px;
+        }
+	</style>
+</head>
+
+<body>
+    This script takes in a reference sign and the dimensions of an output sign. It then calculates the
+    font size that the output sign should have to match the true text size of the reference sign*.
+    <br/><br/>
+    The output sign's limits are calculated to fit the font size limits of 10 and 120, which are unchangeable**.
+    <br/><br/>
+    
+	<div class="cont_hor">
+		<div class="cont_vert">
+    		<h3>Reference sign</h3>
+    		Font size
+        	<div class="cont_hor">
+                Min&nbsp&nbsp
+                <input id="ref_fs_min_in" type="text" class="xthin" disabled=true>
+            	<input id="ref_fs_in" type="text" class="thin">
+                <input id="ref_fs_max_in" type="text" class="xthin" disabled=true>
+                &nbsp&nbspMax
+            </div>
+            <br/><br/>
+            
+    		X
+            <input id="ref_x_in" type="text" class="thin">
+            <br/><br/>
+            
+            Z
+            <input id="ref_z_in" type="text" class="thin">
+        </div>
+        
+		<div class="cont_vert">
+    		<h3>Output sign</h3>
+    		Font size
+        	<div class="cont_hor">
+                Min&nbsp&nbsp
+                <input id="out_fs_min_in" type="text" class="xthin" disabled=true>
+            	<input id="out_fs_in" type="text" class="thin" disabled=true>
+                <input id="out_fs_max_in" type="text" class="xthin" disabled=true>
+                &nbsp&nbspMax
+            </div>
+            <br/><br/>
+            
+    		X
+        	<div class="cont_hor">
+                Min&nbsp&nbsp
+                <input id="out_x_min_in" type="text" class="xthin" disabled=true>
+            	<input id="out_x_in" type="text" class="thin">
+                <input id="out_x_max_in" type="text" class="xthin" disabled=true>
+                &nbsp&nbspMax
+            </div>
+            <br/><br/>
+            
+            Z
+        	<div class="cont_hor">
+                Min&nbsp&nbsp
+                <input id="out_z_min_in" type="text" class="xthin" disabled=true>
+            	<input id="out_z_in" type="text" class="thin">
+                <input id="out_z_max_in" type="text" class="xthin" disabled=true>
+                &nbsp&nbspMax
+            </div>
+        </div>
+    </div>
+    <br/><br/>
+    
+    <i>
+	<br/><br/>
+	<br/><br/>
+	<br/><br/>
+    *TTS = font size multiplied by the higher value between X and Z. This formula has
+    been derived from experimentation, not from the game's code itself.
+	<br/><br/>
+    **Signs that break this limit can be loaded into the editor, but can't be loaded regularly.
+	<br/><br/>
+    Note: Values are rounded to 2 decimal places, although fractional values can't be loaded
+    in-editor nor in-game. The rounding is your choice!
+    </i>
+	<br/><br/>
+</body>
+
+</html>
+
+
+
+<script>
+
+const fs_min = 10;
+const fs_max = 120;
+
+const ref_fs_in = document.getElementById("ref_fs_in");
+const ref_fs_min_in = document.getElementById("ref_fs_min_in");
+const ref_fs_max_in = document.getElementById("ref_fs_max_in");
+const ref_x_in = document.getElementById("ref_x_in");
+const ref_z_in = document.getElementById("ref_z_in");
+
+const out_fs_in = document.getElementById("out_fs_in");
+const out_fs_min_in = document.getElementById("out_fs_min_in");
+const out_fs_max_in = document.getElementById("out_fs_max_in");
+const out_x_in = document.getElementById("out_x_in");
+const out_x_min_in = document.getElementById("out_x_min_in");
+const out_x_max_in = document.getElementById("out_x_max_in");
+const out_z_in = document.getElementById("out_z_in");
+const out_z_min_in = document.getElementById("out_z_min_in");
+const out_z_max_in = document.getElementById("out_z_max_in");
+
+const round_in = document.getElementById("round_in");
+
+ref_fs_min_in.value = fs_min;
+ref_fs_max_in.value = fs_max;
+out_fs_min_in.value = fs_min;
+out_fs_max_in.value = fs_max;
+
+ref_fs_in.save = "";
+ref_fs_in.addEventListener("input", function() { check_input_numonly(event, this); main(); });
+ref_x_in.save = "";
+ref_x_in.addEventListener("input", function() { check_input_numonly(event, this); main(); });
+ref_z_in.save = "";
+ref_z_in.addEventListener("input", function() { check_input_numonly(event, this); main(); });
+out_x_in.save = "";
+out_x_in.addEventListener("input", function() { check_input_numonly(event, this); main(); });
+out_z_in.save = "";
+out_z_in.addEventListener("input", function() { check_input_numonly(event, this); main(); });
+
+
+
+function check_input_numonly(event, ele)
+{
+	if (!is_num(ele.value, 0)) {
+    	ele.value = ele.save;
+    } else {
+    	ele.save = ele.value;
+    }
+}
+
+function main()
+{
+    if (ref_x_in.value === "" || ref_z_in.value === "" || ref_fs_in.value === "") {
+    	out_x_min_in.value = "";
+    	out_x_max_in.value = "";
+    	out_z_min_in.value = "";
+    	out_z_max_in.value = "";
+    	return;
+    }
+    
+    const ref_fs = parseFloat(ref_fs_in.value);
+	const ref_x = parseFloat(ref_x_in.value);
+	const ref_z = parseFloat(ref_z_in.value);
+    const out_x = parseFloat(out_x_in.value);
+    const out_z = parseFloat(out_z_in.value);
+    const higher_min = round_dp(tts(ref_x, ref_z, ref_fs) / fs_max, 2);
+    
+    if (out_x_in.value === "" && out_z_in.value === "") {
+    	out_x_min_in.value = higher_min;
+    	out_z_min_in.value = higher_min;
+    } else {
+        const higher_min_in = (out_x > out_z) ? out_x_min_in : out_z_min_in;    
+        const lower_min_in = (out_x < out_z) ? out_x_min_in : out_z_min_in;
+        const lower = (out_x > out_z) ? out_z : out_x;
+        // If 'lower' > 'higher_min', setting 'higher' below 'higher_min'
+        // would see 'higher' = 'lower' and hence 'higher' > 'higher_min'.
+        // So in this case it's ok for 'higher' to be set below 'higher_min'.
+        higher_min_in.value = (lower > higher_min) ? 0 : higher_min;
+        lower_min_in.value = 0;
+    }
+    
+    out_x_max_in.value = round_dp(tts(ref_x, ref_z, ref_fs) / fs_min, 2);
+    out_z_max_in.value = round_dp(tts(ref_x, ref_z, ref_fs) / fs_min, 2);
+    
+    if (out_x_in.value === "" || out_z_in.value === "") {
+    	out_fs_in.value = "";
+    } else {
+        out_fs_in.value = round_dp(tts(ref_x, ref_z, ref_fs) / tts(out_x, out_z, 1), 2);
+    }
+}
+
+function tts(x, z, fs)
+{
+    return fs * Math.max(z, x);
+}
+
+function round_dp(x, dp)
+{
+	return Math.round((x + Number.EPSILON) * (10 ** dp)) / (10 ** dp);
+}
+
+// Equivalent regex
+// float ? "\d*\.?\d*" : "\d*"
+function is_num(x, float)
+{
+    let dp = 0;
+    
+    for (c of String(x).split("")) {
+    	if (float && c === ".") {
+        	if (dp === 1) {
+            	return false;
+            }
+            
+            dp = 1;
+            continue;
+        }
+        
+    	if (c < "0" || c > "9") {
+        	return false;
+        }
+    }
+    
+    return true;
+}
+
+</script>

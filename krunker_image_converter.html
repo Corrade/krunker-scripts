@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<style type = text/css>
+    	body {
+        	font-family: Arial, Helvetica, sans-serif;
+            background-color: WhiteSmoke;
+        }
+    	.cont_vert {
+        	display: flex;
+            flex-direction: column;
+        }
+    	.cont_hor {
+        	display: flex;
+            justify-content: space-between;
+            max-width: 400px;
+        }
+	</style>
+</head>
+
+<body>
+	<input id="file_in" type="file" onchange="update_canvas()">
+	<br/><br/>
+	<button id="execute_but" onclick="main()" style="height: 50px; width: 200px;">Execute</button>
+	<br/><br/>
+    
+	<h3>Image Preview</h3>
+	<canvas id="canvas" width=0 height=0></canvas>
+	<br/><br/>
+    
+	<h3>Options</h3>
+	<div class="cont_vert">
+		<div class="cont_hor">
+        	<label>Side length:</label>
+            <input id="side_len_in" type="text">
+        </div>
+		<div class="cont_hor">
+        	<label>Depth:</label>
+            <input id="depth_in" type="text">
+        </div>
+		<div class="cont_hor">
+        	<label>Affected by light:</label>
+            <input id="light_in" type="checkbox">
+        </div>
+		<div class="cont_hor">
+        	<label>Collidable:</label>
+            <input id="collidable_in" type="checkbox">
+        </div>
+    </div>
+    <br/><br/>
+    
+	<h3>Asset JSON</h3>
+	<textarea id="output_area" rows="10" cols="100" disabled/></textarea>
+	<br/><br/>
+	<button id="copy_but" onclick="copy()">Copy to Clipboard</button>
+	<br/><br/>
+    
+	<h3>Stats</h3>
+	<div class="cont_vert">
+		<div class="cont_hor">
+        	<label>Pixels:</label>
+            <input id="pixels_in" type="text" disabled=true>
+        </div>
+		<div class="cont_hor">
+        	<label>Object count:</label>
+            <input id="obj_count_in" type="text" disabled=true>
+        </div>
+		<div class="cont_hor">
+        	<label>Objects saved:</label>
+            <input id="objs_saved_in" type="text" disabled=true>
+        </div>
+		<div class="cont_hor">
+        	<label>Compression ratio:</label>
+            <input id="comp_ratio_in" type="text" disabled=true>
+        </div>
+	</div>
+	<br/><br/>
+    
+    <div style="max-width: 400px;">
+		The object limit is 3500 for non-verified players and 6000 for verified players.
+		This limit also applies when hosting maps, so verified players should stick to
+		the non-verified limit if they want their maps to be hosted by non-verified players.
+    </div>
+</body>
+
+</html>
+
+
+
+<script>
+
+let img_width;
+let img_height;
+const file_in = document.getElementById("file_in");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const output_area = document.getElementById("output_area");
+const copy_but = document.getElementById("copy_but");
+
+const side_len_in = document.getElementById("side_len_in");
+const depth_in = document.getElementById("depth_in");
+
+const default_side_len = 1;
+const default_depth = 1;
+side_len_in.value = default_side_len;
+depth_in.value = default_depth;
+let side_len;
+let depth;
+
+const light_in = document.getElementById("light_in");
+const collidable_in = document.getElementById("collidable_in");
+
+const pixels_in = document.getElementById("pixels_in");
+const obj_count_in = document.getElementById("obj_count_in");
+const objs_saved_in = document.getElementById("objs_saved_in");
+const comp_ratio_in = document.getElementById("comp_ratio_in");
+
+side_len_in.addEventListener("change", function() { validate_num_only(side_len_in); });
+side_len_in.addEventListener("keypress", function() { validate_num_only(side_len_in); });
+depth_in.addEventListener("change", function() { validate_num_only(depth_in); });
+depth_in.addEventListener("keypress", function() { validate_num_only(depth_in); });
+
+function validate_num_only(ele)
+{
+	let str = "";
+        
+	for (c of ele.value.split("")) {
+    	if (c >= "0" && c <= "9") {
+        	str += c;
+        }
+    }
+    
+    ele.value = str;
+}
+
+function update_canvas()
+{
+    let fr = new FileReader;
+
+	fr.onload = function() {
+    	let img = new Image;
+
+   		img.onload = function() {
+    		img_width = this.naturalWidth;
+    		img_height = this.naturalHeight;
+            
+    		ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.width = img_width;
+            canvas.height = img_height;
+        	ctx.drawImage(img, 0, 0, img_width, img_height);
+    	};
+
+    	img.src = fr.result;
+    };
+
+	fr.readAsDataURL(file_in.files[0]);
+}
+
+function copy()
+{
+    output_area.disabled = false;
+    output_area.select();
+    document.execCommand("copy");
+    output_area.disabled = true;
+    window.getSelection().removeAllRanges();
+}
+
+function main()
+{
+	let img_arr = ctx.getImageData(0, 0, img_width, img_height).data;
+    let asset = [];
+    
+    if (side_len_in.value === "") {
+    	side_len_in.value = default_side_len;
+    }
+    
+    if (depth_in.value === "") {
+    	depth_in.value = default_depth;
+    }
+    
+    side_len = parseInt(side_len_in.value);
+	depth = parseInt(depth_in.value);
+    
+    for (let col = 0; col < img_width; col++) {
+        process_column(asset, img_arr, img_height - 1, col);
+    }
+    
+    output_area.value = JSON.stringify(asset);
+    
+    pixels_in.value = img_width * img_height;
+    obj_count_in.value = asset.length;
+    objs_saved_in.value = pixels_in.value - obj_count_in.value;
+    comp_ratio_in.value = pixels_in.value / obj_count_in.value;
+}
+
+// Processes a given column, merging adjacent identically-coloured pixels.
+// Only 'row' is changed between recursive calls.
+function process_column(asset, img_arr, row, col)
+{
+    let height = 1;
+    let next_row = row - 1;
+    let colour = get_colour(img_arr, row, col);
+    let opacity = get_opacity(img_arr, row, col);
+
+    while (next_row >= 0) {
+        if (colour === get_colour(img_arr, next_row, col) && opacity === get_opacity(img_arr, next_row, col)) {
+            height++;
+            next_row--;
+        } else {
+            process_column(asset, img_arr, next_row, col);
+            break;
+    	}
+	}
+    
+    if (opacity === 0) {
+        return;
+    }
+        
+	let obj = {
+    	p: [col * side_len, (img_height - 1 - row) * side_len, 0],
+    	s: [side_len, height * side_len, depth]
+	};
+    
+    if (!collidable_in.checked) {
+    	obj.l = 1;
+    }
+    
+    if (light_in.checked) {
+    	obj.c = colour;
+    } else {
+    	obj.c = "#000000";
+    	obj.e = colour;
+    }
+    
+    obj.o = opacity;
+    
+    asset.push(obj);
+}
+
+// Returns the hex RGB colour of a pixel
+function get_colour(img_arr, row, col)
+{
+	let str = "#";
+    
+	for (let i = 0; i < 3; i++) {
+    	str += pad(get_img_arr(img_arr, row, col, i).toString(16), 2, 0);
+	}
+    
+    return str;
+}
+
+// Returns the opacity of a pixel
+function get_opacity(img_arr, row, col)
+{
+    return get_img_arr(img_arr, row, col, 3) / 255;
+}
+
+// Accesses the data array of an image data array as if it were a 3D array
+function get_img_arr(img_arr, row, col, component)
+{
+	return img_arr[(row * img_width * 4) + (col * 4) + component];
+}
+
+// https://stackoverflow.com/questions/10073699/pad-a-number-with-leading-zeros-in-javascript/10073788
+function pad(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+</script>

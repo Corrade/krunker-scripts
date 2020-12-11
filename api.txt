@@ -1,0 +1,65 @@
+By @chuckles#5709
+
+------------------------------------MAPS-------------------------------------------
+
+https://api.krunker.io/maps?index=0&pos=0&accountId=9357418 --- popular maps
+
+https://api.krunker.io/maps?index=1&pos=0&accountId=9357418 --- featured maps
+
+https://api.krunker.io/maps?index=2&pos=0&accountId=9357418 --- new maps
+
+https://api.krunker.io/maps?index=3&pos=0&accountId=9357418 --- kr maps
+
+https://api.krunker.io/maps?index=4&pos=0&accountId=9357418 --- fave maps
+
+https://api.krunker.io/maps?index=5&pos=0&accountId=9357418 --- your maps
+
+https://api.krunker.io/search?type=map&val=cool&cat=-1 --- search maps (val=your search)
+
+https://api.krunker.io/config?mn= --- any settings of a map (nm=map name)
+						
+------------------------------------MODS-------------------------------------------
+
+https://api.krunker.io/mods?index=0&pos=0&accountId=9357418 --- popular mods
+
+https://api.krunker.io/mods?index=1&pos=0&accountId=9357418 --- featured mods
+
+https://api.krunker.io/mods?index=2&pos=0&accountId=9357418 --- new mods
+
+https://api.krunker.io/mods?index=3&pos=0&accountId=9357418 --- your fave mods
+
+https://api.krunker.io/mods?index=4&pos=0&accountId=9357418 --- your mods
+
+https://api.krunker.io/search?type=mod&val=cool&cat=-1 --- search mods (val=your search)
+
+------------------------------------MISC-------------------------------------------
+
+https://krunker.io/docs/versions.txt?t=1184006 --- update logs
+
+https://api.krunker.io/prices --- prices
+
+https://matchmaker.krunker.io/game-list?hostname=krunker.io --- active games
+
+https://matchmaker.krunker.io/game-info?game=SV%3A6hi6x --- info on any game
+
+https://social.krunker.io/player-count --- total number of players online
+
+https://api.krunker.io/streams?index=0 --- krunker streams (change index for different streamers)
+
+https://matchmaker.krunker.io/generate-token --- Generates some sort of token for krunker
+
+https://krunker.io/docs/terms.txt --- krunker official terms
+
+
+
+
+
+https://user-assets.krunker.io/{map-id}/thumb.png             Map Thumb
+https://user-assets.krunker.io/{asset-id}/model.obj           Asset obj
+https://user-assets.krunker.io/{asset-id}/model.png           Asset Texture
+https://api.krunker.io/maps?index=3&pos=0&accountId={account id} 
+https://api.krunker.io/search?type=mod&val=
+https://api.krunker.io/assets?
+https://matchmaker.krunker.io/game-info?game=FRA:pm1oe
+https://api.krunker.io/search?type=map&val=bhop_Levels%206.4
+https://matchmaker.krunker.io/game-list?hostname=krunker.io
